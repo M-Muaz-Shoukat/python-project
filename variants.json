@@ -1,0 +1,22 @@
+[
+    {
+        "id": 0,
+        "name": "Color",
+        "value": "Red"
+    },
+    {
+        "id": 1,
+        "name": "Size",
+        "value": "Small"
+    },
+    {
+        "id": 2,
+        "name": "Length",
+        "value": "100cm"
+    },
+    {
+        "id": 3,
+        "name": "Color",
+        "value": "Green"
+    }
+]
