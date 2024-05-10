@@ -138,5 +138,62 @@
                 ]
             }
         ]
+    },
+    {
+        "id": 3,
+        "name": "New shirt",
+        "description": "New New New Sale shirt",
+        "status": "inactive",
+        "img_path": "",
+        "variations": [
+            {
+                "id": 0,
+                "quantity": 100,
+                "price": 1000.0,
+                "variants": [
+                    {
+                        "id": 0,
+                        "name": "Color",
+                        "value": "Red"
+                    },
+                    {
+                        "id": 3,
+                        "name": "Color",
+                        "value": "Green"
+                    },
+                    {
+                        "id": 2,
+                        "name": "Length",
+                        "value": "100cm"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "name": "ABCD",
+        "description": "Pant",
+        "status": "active",
+        "img_path": "",
+        "variations": [
+            {
+                "id": 0,
+                "quantity": 5,
+                "price": 6,
+                "variants": [
+                    {
+                        "id": 0,
+                        "name": "Color",
+                        "value": "Blue"
+                    },
+                    {
+                        "id": 1,
+                        "name": "Size",
+                        "value": "XL"
+                    }
+                ]
+            }
+        ]
     }
 ]
