@@ -2,6 +2,14 @@ from db.DBManager import db_manager
 from Model.product import Product
 from Model.variant import Variant
 from Model.variant_option import VariantOption
+from tabulate import tabulate
+import sys
+
+def clear_console():
+    sys.stdout.write('\033[H\033[J')
+    sys.stdout.flush()
+
+
 class Inventory_Manager:
     def __init__(self):
         self.products = Product.get_products()
@@ -30,28 +38,21 @@ class Inventory_Manager:
                 return
         print("\n\n Variant not found \n\n")
 
-
     def print_variants(self):
+        data = []
         for x in self.variants:
-            print(f'{x['id']} -> {x['name']}')
-        print() 
+            data.append([x['id'], x['name']])
+        headers = ["ID", "Name"]
+        print(tabulate(data, headers=headers, tablefmt="grid"))
 
     def compare_objects(arr1, arr2):
-        # Check if the lengths of the arrays are different
         if len(arr1) != len(arr2):
             return 0
-
-        # Sort both arrays based on the 'name' attribute to ensure consistent comparison
         arr1.sort(key=lambda x: x['name'])
         arr2.sort(key=lambda x: x['name'])
-
-        # Iterate over the arrays and compare corresponding objects
         for obj1, obj2 in zip(arr1, arr2):
-            # Check if 'name' and 'value' attributes match
             if obj1['name'] != obj2['name'] or obj1['value'] != obj2['value']:
-                return 0  # Objects don't match, return 0
-
-        # All objects match, return 1
+                return 0 
         return 1   
     
     def create_product(self,name,description,status,img_path):
@@ -154,16 +155,42 @@ class Inventory_Manager:
                 return
         print("\n\n Product not found \n\n")
 
+
     def print_products(self):
         for product in self.products:
-            print(f'id: {product['id']} -- name: {product['name']} -- status: {product['status']}')
-            print(f'description: {product['description']}')
+            print(f'id: {product["id"]} -- name: {product["name"]} -- status: {product["status"]}')
+            print(f'description: {product["description"]}')
             print('variations: ')
+            variations_data = []
             for variant in product['variations']:
-                print(f'\tid: {variant['id']} -- quantity: {variant['quantity']} -- price: {variant['price']}')
+                variations_data.append([
+                    variant['id'],
+                    variant['quantity'],
+                    variant['price']
+                ])
+            print(tabulate(variations_data, headers=["ID", "Quantity", "Price"], tablefmt="grid"))
+            for variant in product['variations']:
+                print(f'\nVariant {variant["id"]} details:')
+                variant_data = []
                 for var in variant['variants']:
-                    print(f'\t\t name: {var['name']} -- value: {var['value']}')
-                print()
+                    variant_data.append([
+                        var['name'],
+                        var['value']
+                    ])
+                print(tabulate(variant_data, headers=["Name", "Value"], tablefmt="grid"))
+
+
+
+    # def print_products(self):
+    #     for product in self.products:
+    #         print(f'id: {product['id']} -- name: {product['name']} -- status: {product['status']}')
+    #         print(f'description: {product['description']}')
+    #         print('variations: ')
+    #         for variant in product['variations']:
+    #             print(f'\tid: {variant['id']} -- quantity: {variant['quantity']} -- price: {variant['price']}')
+    #             for var in variant['variants']:
+    #                 print(f'\t\t name: {var['name']} -- value: {var['value']}')
+    #             print()
 
 ivm = Inventory_Manager()
 statusArray = ['active','inactive']
@@ -172,6 +199,7 @@ while True:
     option = input("Choose option: ")
     match option:
         case '0':
+            clear_console()
             name = input('Product Name: ')
             print('Status:')
             for index,status in enumerate(statusArray):
@@ -182,25 +210,32 @@ while True:
 
             ivm.create_product(name,description,status,'')
         case '1':
+            clear_console()
             ivm.print_products()
         case '2':
+            clear_console()
             ivm.print_products()
             id = int(input('Product to delete(id):'))
             ivm.delete_product(id)
         case '3':
+            clear_console()
             name = input("Variant Name: ")
             ivm.create_variant(name)
         case '4':
+            clear_console()
             ivm.print_variants()
         case '5':
+            clear_console()
             ivm.print_variants()
             id = int(input('Variant to delete(id):'))
             ivm.delete_variant(id)
         case '6':
+            clear_console()
             ivm.print_products()
             id = int(input('Product to update(id): '))
             ivm.update_product(id)
         case '7':
+            clear_console()
             ivm.print_variants()
             id = int(input('Variant to update(id): '))
             name = input('New Variant Name (leave empty to keep unchanged): ')
