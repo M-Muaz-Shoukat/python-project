@@ -45,7 +45,7 @@ class Inventory_Manager:
         headers = ["ID", "Name"]
         print(tabulate(data, headers=headers, tablefmt="grid"))
 
-    def compare_objects(arr1, arr2):
+    def compare_objects(self,arr1, arr2):
         if len(arr1) != len(arr2):
             return 0
         arr1.sort(key=lambda x: x['name'])
@@ -61,29 +61,32 @@ class Inventory_Manager:
         print('Add Variations:')
         while flag:
             print('Choose variant Index:')
-            for index,var in enumerate(self.variants):
-                print(f'{index} -- name: {var['name']}')
-            variantIndexes = input('choose all variants seperated by space like this(1 2 3 4): ')
+            for index, var in enumerate(self.variants):
+                print(f'{index} -- name: {var["name"]}')
+            variantIndexes = input('choose all variants separated by space like this (1 2 3 4): ')
             variantIndexes = variantIndexes.strip().split(' ')
-            variantIndexes = [self.variants[int(x)] for x in variantIndexes]
-            for variantOption in variantIndexes:
-                value = input(f'Enter value for variant {variantOption['name']}: ')
+            variantOptions = []
+            for index in variantIndexes:
+                variantOption = self.variants[int(index)].copy()  
+                value = input(f'Enter value for variant {variantOption["name"]}: ')
                 variantOption['value'] = value
+                variantOptions.append(variantOption)
             quantity = int(input('Enter Quantity: '))
             price = float(input('Enter Price: '))
-            variant = Variant(len(variations),quantity,price,variantIndexes)
+            variant = Variant(len(variations), quantity, price, variantOptions)
             curvariant = variant.get_product_variant()
             existingFlag = 0
-            for var in variations:
-                if self.compare_objects(curvariant['variants'], var['variants']):
-                    existingFlag = 1 
+            for varian in variations:
+                if self.compare_objects(curvariant['variants'], varian['variants']):
+                    existingFlag = 1
+                    break
 
             if existingFlag == 1:
                 print("Variant already exists")
             else:
-                variations.append(variant.get_product_variant())  
-                
-            if(int(input('0 --> Want to add more\n1 --> Done with variations\nchoose: '))):
+                variations.append(curvariant)
+
+            if int(input('0 --> Want to add more\n1 --> Done with variations\nchoose: ')):
                 break
         product = Product(len(self.products),name,description,status,img_path,variations)
         self.products.append(product.get_product())
@@ -138,7 +141,6 @@ class Inventory_Manager:
                                         variantOption['value'] = value
                                 quantity = input('Quantity (leave empty to keep unchanged): ')
                                 price = input('Price (leave empty to keep unchanged): ')
-                                # print("variantIndexes",variantIndexes)
                                 if quantity != '':
                                     product['variations'][editVariation]['quantity'] = int(quantity)
                                 if price != '':
@@ -179,18 +181,6 @@ class Inventory_Manager:
                     ])
                 print(tabulate(variant_data, headers=["Name", "Value"], tablefmt="grid"))
 
-
-
-    # def print_products(self):
-    #     for product in self.products:
-    #         print(f'id: {product['id']} -- name: {product['name']} -- status: {product['status']}')
-    #         print(f'description: {product['description']}')
-    #         print('variations: ')
-    #         for variant in product['variations']:
-    #             print(f'\tid: {variant['id']} -- quantity: {variant['quantity']} -- price: {variant['price']}')
-    #             for var in variant['variants']:
-    #                 print(f'\t\t name: {var['name']} -- value: {var['value']}')
-    #             print()
 
 ivm = Inventory_Manager()
 statusArray = ['active','inactive']
