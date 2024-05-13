@@ -1,18 +1,16 @@
+from db.db_manager import DBManager
+from model.base import Base
 
-class Variant:
-    def __init__(self,id,quantity,price,variants):
+class Variant(Base):
+    def __init__(self,id,name):
         self.id = id
-        self.quantity = quantity
-        self.price = price
-        self.variants = variants
-
-    def get_product_variant(self):
-        return {
-            "id": self.id,
-            "quantity": self.quantity,
-            "price": self.price,
-            "variants": self.variants
-        }
+        self.name = name
     
-
+    # @staticmethod
+    # def get_variants():
+    #     return DBManager.read('./db/data/variants.json')
         
+    # @staticmethod
+    # def write_variants(data):
+    #     DBManager.save('./db/data/variants.json',data)
+    

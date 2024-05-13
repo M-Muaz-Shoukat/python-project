@@ -1,6 +1,6 @@
 import json
 
-class db_manager:
+class DBManager:
     @staticmethod
     def read(file_path):
         with open(file_path, 'r') as f:
@@ -11,4 +11,3 @@ class db_manager:
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
 
-    

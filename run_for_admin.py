@@ -1,7 +1,7 @@
-from db.DBManager import db_manager
-from Model.product import Product
-from Model.variant import Variant
-from Model.variant_option import VariantOption
+from model.product import Product
+from model.product_variant_options import ProductVariantOptions
+from model.product_variant import ProductVariant
+from model.variant import Variant
 from tabulate import tabulate
 import sys
 
@@ -10,22 +10,20 @@ def clear_console():
     sys.stdout.flush()
 
 
-class Inventory_Manager:
+class InventoryManager:
     def __init__(self):
-        self.products = Product.get_products()
-        self.variants = VariantOption.get_variants()
-
+        self.products = Product.load('./db/data/products.json')
+        self.variants = Variant.load('./db/data/variants.json')
 
     def create_variant(self,name):
-        variant = VariantOption(name)
-        data = variant.get_variant(len(self.variants))
-        self.variants.append(data)
-        VariantOption.write_variants(self.variants)
+        variant = Variant(len(self.variants),name)
+        self.variants.append(variant.__dict__)
+        Variant.save('./db/data/variants.json',self.variants)
         print('\n\n Vaiant Created Successfully \n\n')
 
     def delete_variant(self,id):
         self.variants = [variant for variant in self.variants if variant['id']!=id]
-        VariantOption.write_variants(self.variants)
+        Variant.save('./db/data/variants.json',self.variants)
         print('\n\n Variant Deleted Successfully \n\n')
 
     def update_variant(self, id, name=None):
@@ -33,7 +31,7 @@ class Inventory_Manager:
             if variant['id'] == id:
                 if name != '':
                     variant['name'] = name
-                VariantOption.write_variants(self.variants)
+                Variant.save('./db/data/variants.json',self.variants)
                 print('\n\n Variant Updated Successfully \n\n')
                 return
         print("\n\n Variant not found \n\n")
@@ -69,12 +67,12 @@ class Inventory_Manager:
             for index in variantIndexes:
                 variantOption = self.variants[int(index)].copy()  
                 value = input(f'Enter value for variant {variantOption["name"]}: ')
-                variantOption['value'] = value
-                variantOptions.append(variantOption)
+                productVariant = ProductVariant(index,variantOption['name'],value)
+                variantOptions.append(productVariant.__dict__)
             quantity = int(input('Enter Quantity: '))
             price = float(input('Enter Price: '))
-            variant = Variant(len(variations), quantity, price, variantOptions)
-            curvariant = variant.get_product_variant()
+            variant = ProductVariantOptions(len(variations), quantity, price, variantOptions)
+            curvariant = variant.__dict__
             existingFlag = 0
             for varian in variations:
                 if self.compare_objects(curvariant['variants'], varian['variants']):
@@ -89,13 +87,13 @@ class Inventory_Manager:
             if int(input('0 --> Want to add more\n1 --> Done with variations\nchoose: ')):
                 break
         product = Product(len(self.products),name,description,status,img_path,variations)
-        self.products.append(product.get_product())
-        Product.write_products(self.products)
+        self.products.append(product.__dict__)
+        Product.save('./db/data/products.json',self.products)
         print('\n\n product Created Successfully \n\n')
 
     def delete_product(self,id):
         self.products = [product for product in self.products if product['id']!=id]
-        Product.write_products(self.products)
+        Product.save('./db/data/products.json',self.products)
         print('\n\n product Deleted Successfully \n\n')
 
     def update_product(self, id):
@@ -141,7 +139,6 @@ class Inventory_Manager:
                                         variantOption['value'] = value
                                 quantity = input('Quantity (leave empty to keep unchanged): ')
                                 price = input('Price (leave empty to keep unchanged): ')
-                                # print("variantIndexes",variantIndexes)
                                 if quantity != '':
                                     product['variations'][editVariation]['quantity'] = int(quantity)
                                 if price != '':
@@ -153,7 +150,7 @@ class Inventory_Manager:
                                     break
                     case _:
                         pass
-                Product.write_products(self.products)
+                Product.save('./db/data/products.json',self.products)
                 print('\n\n Product Updated Successfully \n\n')
                 return
         print("\n\n Product not found \n\n")
@@ -183,19 +180,7 @@ class Inventory_Manager:
                 print(tabulate(variant_data, headers=["Name", "Value"], tablefmt="grid"))
 
 
-
-    # def print_products(self):
-    #     for product in self.products:
-    #         print(f'id: {product['id']} -- name: {product['name']} -- status: {product['status']}')
-    #         print(f'description: {product['description']}')
-    #         print('variations: ')
-    #         for variant in product['variations']:
-    #             print(f'\tid: {variant['id']} -- quantity: {variant['quantity']} -- price: {variant['price']}')
-    #             for var in variant['variants']:
-    #                 print(f'\t\t name: {var['name']} -- value: {var['value']}')
-    #             print()
-
-ivm = Inventory_Manager()
+ivm = InventoryManager()
 statusArray = ['active','inactive']
 while True:
     print('0 --> Create Product\n1 --> Print Products\n2 --> Delete Product\n3 --> Create Variant\n4 --> Print Variants\n5 --> Delete Variant\n6 --> Update Product\n7 --> Update Variant\nAnything else to exit\n')
@@ -245,16 +230,4 @@ while True:
             ivm.update_variant(id, name)
         case _:
             break
-
-
-
-
-
-
-
-
-
-
-
-
 
