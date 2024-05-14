@@ -12,18 +12,24 @@ def clear_console():
 
 class InventoryManager:
     def __init__(self):
-        self.products = Product.load('./db/data/products.json')
-        self.variants = Variant.load('./db/data/variants.json')
+        self.get_products()
+        self.get_variants()
+        
+    def get_products(self):
+        self.products = Product.load(file_path='./db/data/products.json')
+    
+    def get_variants(self):
+        self.variants = Variant.load(file_path='./db/data/variants.json')
 
     def create_variant(self,name):
         variant = Variant(len(self.variants),name)
-        self.variants.append(variant.__dict__)
-        Variant.save('./db/data/variants.json',self.variants)
+        Variant.save(file_path='./db/data/variants.json',data=variant.__dict__)
+        self.get_variants()
         print('\n\n Vaiant Created Successfully \n\n')
 
     def delete_variant(self,id):
-        self.variants = [variant for variant in self.variants if variant['id']!=id]
-        Variant.save('./db/data/variants.json',self.variants)
+        Variant.delete(file_path='./db/data/variants.json',id=id)
+        self.get_variants()
         print('\n\n Variant Deleted Successfully \n\n')
 
     def update_variant(self, id, name=None):
@@ -31,7 +37,7 @@ class InventoryManager:
             if variant['id'] == id:
                 if name != '':
                     variant['name'] = name
-                Variant.save('./db/data/variants.json',self.variants)
+                Variant.update(file_path='./db/data/variants.json',id=id,data=variant)
                 print('\n\n Variant Updated Successfully \n\n')
                 return
         print("\n\n Variant not found \n\n")
@@ -43,7 +49,7 @@ class InventoryManager:
         headers = ["ID", "Name"]
         print(tabulate(data, headers=headers, tablefmt="grid"))
 
-    def compare_objects(arr1, arr2):
+    def compare_objects(self,arr1, arr2):
         if len(arr1) != len(arr2):
             return 0
         arr1.sort(key=lambda x: x['name'])
@@ -63,6 +69,7 @@ class InventoryManager:
                 print(f'{index} -- name: {var["name"]}')
             variantIndexes = input('choose all variants separated by space like this (1 2 3 4): ')
             variantIndexes = variantIndexes.strip().split(' ')
+            variantIndexes = list(set(variantIndexes))
             variantOptions = []
             for index in variantIndexes:
                 variantOption = self.variants[int(index)].copy()  
@@ -78,22 +85,20 @@ class InventoryManager:
                 if self.compare_objects(curvariant['variants'], varian['variants']):
                     existingFlag = 1
                     break
-
             if existingFlag == 1:
                 print("Variant already exists")
             else:
                 variations.append(curvariant)
-
             if int(input('0 --> Want to add more\n1 --> Done with variations\nchoose: ')):
                 break
         product = Product(len(self.products),name,description,status,img_path,variations)
-        self.products.append(product.__dict__)
-        Product.save('./db/data/products.json',self.products)
+        Product.save(file_path='./db/data/products.json',data=product.__dict__)
+        self.get_products()
         print('\n\n product Created Successfully \n\n')
 
     def delete_product(self,id):
-        self.products = [product for product in self.products if product['id']!=id]
-        Product.save('./db/data/products.json',self.products)
+        Product.delete(file_path='./db/data/products.json',id=id)
+        self.get_products()
         print('\n\n product Deleted Successfully \n\n')
 
     def update_product(self, id):
@@ -133,6 +138,7 @@ class InventoryManager:
                                 variantIndexes = input('choose all variants seperated by space like this(1 2 3 4) (leave empty to keep unchanged): ')
                                 if(variantIndexes != ''):
                                     variantIndexes = variantIndexes.strip().split(' ')
+                                    variantIndexes = list(set(variantIndexes))
                                     variantIndexes = [self.variants[int(x)] for x in variantIndexes]
                                     for variantOption in variantIndexes:
                                         value = input(f'Enter value for variant {variantOption['name']}: ')
@@ -150,7 +156,7 @@ class InventoryManager:
                                     break
                     case _:
                         pass
-                Product.save('./db/data/products.json',self.products)
+                Product.update(file_path='./db/data/products.json',id=id,data=product)
                 print('\n\n Product Updated Successfully \n\n')
                 return
         print("\n\n Product not found \n\n")
